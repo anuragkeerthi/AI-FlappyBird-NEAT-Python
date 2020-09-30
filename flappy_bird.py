@@ -44,7 +44,7 @@ class Bird:
         if displacement < 0:
             displacement -= 2
 
-        self.y = self.y + d
+        self.y = self.y + displacement
 
         if displacement < 0 or self.y < self.height + 50:
             if self.tilt < self.MAX_ROTATION:
@@ -53,5 +53,20 @@ class Bird:
             if self.tilt > -90:
                 self.tilt -= self.ROTATION_VELOCITY
 
+    def draw(self, window):
+        self.image_count += 1
 
+        if self.image_count < self.ANIMATION_TIME:
+            self.image = self.IMAGES[0]
+        elif self.image_count < self.ANIMATION_TIME*2:
+            self.image = self.IMAGES[1]
+        elif self.image_count < self.ANIMATION_TIME*3:
+            self.image = self.IMAGES[2]
+        elif self.image_count < self.ANIMATION_TIME*4:
+            self.image = self.IMAGES[1]
+        elif self.image_count == self.ANIMATION_TIME*4 + 1:
+            self.image = self.IMAGES[0]
+            self.image_count = 0
+
+    
 
