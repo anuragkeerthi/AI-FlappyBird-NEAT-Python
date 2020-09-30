@@ -137,8 +137,8 @@ class Base:
 
 
     def move(self):
-        self.x1 = self.VELOCITY
-        self.x2 = self.VELOCITY
+        self.x1 -= self.VELOCITY
+        self.x2 -= self.VELOCITY
 
         if self.x1 + self.WIDTH < 0:
             self.x1 = self.x2 + self.WIDTH
