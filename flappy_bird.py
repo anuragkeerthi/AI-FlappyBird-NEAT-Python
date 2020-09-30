@@ -68,5 +68,11 @@ class Bird:
             self.image = self.IMAGES[0]
             self.image_count = 0
 
-    
+        if self.tilt <= -80:
+            self.image = self.IMAGES[1]
+            self.image_count = self.ANIMATION_TIME*2
+
+
+
+
 
