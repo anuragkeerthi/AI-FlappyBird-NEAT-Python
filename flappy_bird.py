@@ -153,7 +153,7 @@ class Base:
         window.blit(self.IMAGE, (self.x1, self.y))
         window.blit(self.IMAGE, (self.x2, self.y))
 
-def draw_window(window, bird, pipes, base, score):
+def draw_window(window, birds, pipes, base, score):
     window.blit(BACKGROUND_IMAGE, (0,0))
 
     for pipe in pipes:
@@ -164,7 +164,9 @@ def draw_window(window, bird, pipes, base, score):
 
     base.draw(window)
 
-    bird.draw(window)
+    for bird in birds:
+        bird.draw(window)
+
     pygame.display.update()
 
 
@@ -173,8 +175,8 @@ def main(genomes, config):
     ge = []
     birds = []
 
-    for g in genomes:
-        net = neat.nn.FeedForwardNetwork(g, config)
+    for _, g in genomes:
+        net = neat.nn.FeedForwardNetwork.create(g, config)
         nets.append(net)
         birds.append(Bird(230,350))
         g.fitness = 0
@@ -193,14 +195,25 @@ def main(genomes, config):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                pygame.quit()
+                quit()
+
         pipe_index = 0
         if len(birds) > 0:
             if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():
                 pipe_index = 1
+        else:
+            run = False
+            break
 
         for x, bird in enumerate(birds):
             bird.move()
             ge[x].fitness += 0.1 
+
+            output = nets[x].activate((bird.y, abs(bird.y - pipes[pipe_index].height), abs(bird.y - pipes[pipe_index].bottom)))
+
+            if output[0] > 0.5:
+                bird.jump()
 
         #bird.move()
         add_pipe = False
@@ -233,19 +246,14 @@ def main(genomes, config):
             pipes.remove(r)
 
         for x, bird in enumerate(birds):
-            if bird.y + bird.image.get_height() >= 730:
+            if bird.y + bird.image.get_height() >= 730 or bird.y < 0 :
                 birds.pop(x)
                 nets.pop(x)
                 ge.pop(x)
 
         base.move()
-        draw_window(window, bird, pipes, base, score)
+        draw_window(window, birds, pipes, base, score)
 
-    pygame.quit()
-    quit()
-
-
-main()
 
 
 def run(config_path):
