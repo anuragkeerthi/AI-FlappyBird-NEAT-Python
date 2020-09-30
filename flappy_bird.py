@@ -4,7 +4,7 @@ import time
 import os
 import random
 
-WINDOW_WIDTH = 600
+WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 800
 
 BIRD_IMAGES = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird1.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird2.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird3.png")))]
@@ -71,6 +71,37 @@ class Bird:
         if self.tilt <= -80:
             self.image = self.IMAGES[1]
             self.image_count = self.ANIMATION_TIME*2
+
+        rotated_image = pygame.transform.rotate(self.image, self.tilt)
+        new_rect = rotated_image.get_rect(center = self.image.get_rect(topleft = (self.x, self.y)).center)
+        window.blit(rotated_image, new_rect.topleft)
+
+    def get_mask(self):
+        return pygame.mask.from_surface(self.image)
+
+
+def draw_window(window, bird):
+    window.blit(BACKGROUND_IMAGE, (0,0))
+    bird.draw(window)
+    pygame.display.update()
+
+
+def main():
+    bird = Bird(200,200)
+    window = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
+    run = True
+    
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+        draw_window(window, bird)
+
+    pygame.quit()
+    quit()
+
+
 
 
 
