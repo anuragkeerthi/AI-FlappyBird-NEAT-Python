@@ -3,6 +3,7 @@ import neat
 import time
 import os
 import random
+pygame.font.init()
 
 pygame.init()
 WINDOW_WIDTH = 500
@@ -12,6 +13,8 @@ BIRD_IMAGES = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "
 PIPE_IMAGE = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "pipe.png")))
 BASE_IMAGE = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "base.png")))
 BACKGROUND_IMAGE = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bg.png")))
+
+STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
 class Bird:
     IMAGES = BIRD_IMAGES
@@ -150,10 +153,14 @@ class Base:
         window.blit(self.IMAGE, (self.x1, self.y))
         window.blit(self.IMAGE, (self.x2, self.y))
 
-def draw_window(window, bird, pipes, base):
+def draw_window(window, bird, pipes, base, score):
     window.blit(BACKGROUND_IMAGE, (0,0))
+
     for pipe in pipes:
         pipe.draw(window)
+
+    text = STAT_FONT.render("Score: " +str(score), 1, (255,255,255))
+    window.blit(text, (WINDOW_WIDTH - 10 - text.get_width(), 10))
 
     base.draw(window)
 
@@ -167,6 +174,8 @@ def main():
     pipes = [Pipe(700)]
     window = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
     clock = pygame.time.Clock()
+
+    score = 0
     
     run = True
     while run:
@@ -176,8 +185,33 @@ def main():
                 run = False
 
         #bird.move()
+        add_pipe = False
+        remove = []
+        for pipe in pipes:
+            if pipe.collide(bird):
+                pass
+
+            if pipe.x + pipe.PIPE_TOP.get_width() < 0 :
+                remove.append(pipe)
+
+            if not pipe.passed and pipe.x < bird.x:
+                pipe.passed = True
+                add_pipe = True
+
+            pipe.move()
+
+        if add_pipe:
+            score += 1
+            pipes.append(Pipe(700))
+
+        for r in remove:
+            pipes.remove(r)
+
+        if bird.y + bird.image.get_height() >= 730:
+            pass
+
         base.move()
-        draw_window(window, bird, pipes, base)
+        draw_window(window, bird, pipes, base, score)
 
     pygame.quit()
     quit()
